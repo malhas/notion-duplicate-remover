@@ -1,0 +1,10 @@
+# Ignore environment variables and secrets
+.env
+*.env
+.env*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
