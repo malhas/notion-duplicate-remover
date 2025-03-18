@@ -1,0 +1,50 @@
+name: Notion Duplicate Remover
+
+on:
+    schedule:
+        # Run daily at 3:00 AM UTC
+        - cron: "0 2 * * *"
+    workflow_dispatch:
+        # Allow manual triggering
+
+jobs:
+    remove-duplicates:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.10"
+                  cache: "pip"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+
+            - name: Create logs directory
+              run: mkdir -p logs
+
+            - name: Generate timestamp
+              id: timestamp
+              run: echo "value=$(date +"%Y-%m-%d_%H-%M-%S")" >> $GITHUB_OUTPUT
+
+            - name: Run duplicate remover script
+              env:
+                  NOTION_TOKEN: ${{ secrets.MY_NOTION_TOKEN }}
+                  NOTION_DATABASE_ID: ${{ secrets.MY_NOTION_DATABASE_ID }}
+              run: python notion_duplicates.py > logs/my_notion_duplicates_${{ steps.timestamp.outputs.value }}.log
+
+            - name: Configure Git
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name "github-actions[bot]"
+
+            - name: Commit log file
+              run: |
+                  git add logs/my_notion_duplicates_${{ steps.timestamp.outputs.value }}.log
+                  git commit -m "Add duplicate removal log for ${{ steps.timestamp.outputs.value }}" || echo "No changes to commit"
+                  git push

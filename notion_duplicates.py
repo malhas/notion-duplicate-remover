@@ -1,13 +1,17 @@
 import os
 import time
+import argparse
 from datetime import datetime
-import httpx
 from dotenv import load_dotenv
 from notion_client import Client
 from notion_client import errors as notion_errors
 
 # Load environment variables
-load_dotenv()
+parser = argparse.ArgumentParser(description="Remove duplicate entries from a Notion database")
+parser.add_argument("--env", default=".env", help="Path to environment file (default: .env)")
+
+args = parser.parse_args()
+load_dotenv(args.env)
 
 # Initialize Notion client
 notion = Client(auth=os.getenv("NOTION_TOKEN"))
