@@ -1,9 +1,9 @@
 name: Notion Duplicate Remover
 
 on:
-    schedule:
+    #schedule:
         # Run daily at 3:00 AM UTC
-        - cron: "0 2 * * *"
+        #- cron: "0 2 * * *"
     workflow_dispatch:
         # Allow manual triggering
 
